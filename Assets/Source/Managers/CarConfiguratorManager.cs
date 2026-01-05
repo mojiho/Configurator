@@ -1,8 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-/*
-    데이터를 읽어와서 차량의 색상과 아이템, 휠을 변경하는 매니저 스크립트입니다.
-*/
 
 public class CarConfiguratorManager : MonoBehaviour
 {
@@ -28,10 +25,14 @@ public class CarConfiguratorManager : MonoBehaviour
     {
         // 초기화 : 첫 번째 색상과 휠로 설정
         if (database.exteriorColors.Count > 0)
-            ApplyPaint(database.exteriorColors[0]);
+        {
+            ApplyPaint((CarPaintData)database.exteriorColors[0]);
+        }
 
         if (database.wheels.Count > 0)
-            ApplyWheel(database.wheels[0]);
+        {
+            ApplyWheel((CarModelData)database.wheels[0]);
+        }
 
         ApplyTrim(CarTrim.STD);
     }
@@ -44,7 +45,6 @@ public class CarConfiguratorManager : MonoBehaviour
         if (carBodyRenderer)
         {
             carBodyRenderer.sharedMaterial = paintData.material;
-
             Debug.Log($"색상 변경 완료: {paintData.partName}");
         }
     }
@@ -54,7 +54,7 @@ public class CarConfiguratorManager : MonoBehaviour
     {
         if (index >= 0 && index < database.exteriorColors.Count)
         {
-            ApplyPaint(database.exteriorColors[index]);
+            ApplyPaint((CarPaintData)database.exteriorColors[index]);
         }
     }
 
@@ -76,8 +76,6 @@ public class CarConfiguratorManager : MonoBehaviour
             GameObject newWheel = Instantiate(wheelData.prefab, mountPoint.position, mountPoint.rotation, mountPoint);
             currentWheels.Add(newWheel);
         }
-
-        //Debug.Log($"휠 교체 완료: {wheelData.partName}");
     }
 
     // UI 버튼용 함수
@@ -85,7 +83,7 @@ public class CarConfiguratorManager : MonoBehaviour
     {
         if (index >= 0 && index < database.wheels.Count)
         {
-            ApplyWheel(database.wheels[index]);
+            ApplyWheel((CarModelData)database.wheels[index]);
         }
     }
 
@@ -97,33 +95,23 @@ public class CarConfiguratorManager : MonoBehaviour
     {
         if (trimName == "STD")
         {
-            Debug.Log("STD 트림 선택됨: 범퍼 교체, 전용 휠 장착...");
-            // 여기에 STD용 범퍼 모델을 켜고, X-LINE용을 끄는 로직 추가
-            // 예: bumperSTD.SetActive(true); bumperXLINE.SetActive(false);
+            Debug.Log("STD 트림 선택됨");
         }
         else if (trimName == "XLINE")
         {
-            Debug.Log("X-LINE 트림 선택됨: 전용 디자인 적용...");
-            // 예: bumperSTD.SetActive(false); bumperXLINE.SetActive(true);
+            Debug.Log("X-LINE 트림 선택됨");
         }
     }
 
     public void ApplyTrim(CarTrim trimType)
     {
-        // 초기화
-        //foreach (var part in stdParts) if (part) part.SetActive(false);
-        //foreach (var part in xlineParts) if (part) part.SetActive(false);
-
-        // 선택된 트림에 맞는 파츠만 켭니다
         switch (trimType)
         {
             case CarTrim.STD:
-                //foreach (var part in stdParts) if (part) part.SetActive(true);
                 Debug.Log("트림 변경 완료: STD");
                 break;
 
             case CarTrim.XLINE:
-                //foreach (var part in xlineParts) if (part) part.SetActive(true);
                 Debug.Log("트림 변경 완료: X-LINE");
                 break;
         }
@@ -131,10 +119,7 @@ public class CarConfiguratorManager : MonoBehaviour
 
     public void SetTrimFromToggle(int trimIndex)
     {
-        // 숫자를 Enum으로 변환 (Casting)
         CarTrim selectedTrim = (CarTrim)trimIndex;
-
-        // 실제 로직 실행
         ApplyTrim(selectedTrim);
     }
 }

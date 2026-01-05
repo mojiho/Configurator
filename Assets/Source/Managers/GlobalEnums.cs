@@ -20,7 +20,8 @@ public enum PartType
     Paint,      // 외장 페인트
     Wheel,      // 휠
     Interior,   // 내장재
-    RoofRack    // 루프랙
+    RoofRack,    // 루프랙
+    Exterior    // 외관
 }
 
 /// <summary>

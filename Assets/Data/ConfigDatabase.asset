@@ -14,7 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigDatabase
   exteriorColors:
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   wheels:
   - {fileID: 0}
+  - {fileID: 0}
   interiorColors:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}

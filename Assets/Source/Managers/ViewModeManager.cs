@@ -3,21 +3,29 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using DG.Tweening;
 
+/*뷰 모드(외관 / 내부) 전환 및 카메라 이동을 관리하는 매니저 스크립트입니다.*/
+
 public class ViewModeManager : MonoBehaviour
 {
     [System.Serializable]
     public class ViewOption
     {
         public string viewName;
-        public Button button;          // 클릭할 버튼 본체
-
-        [Header("UI Components")]
-        public Image buttonBackground; // 버튼의 배경 이미지 (Button 오브젝트 본체)
-        public Image buttonIcon;       // 버튼 안에 들어있는 아이콘 이미지 (자식)
+        public Button button;
 
         [Header("Camera Settings")]
-        public Transform cameraTarget;
+        public Transform cameraTarget; // 카메라가 도착할 위치
+        public Transform orbitPivot;   
+
+        [Range(20, 120)]
         public float fieldOfView = 60f;
+
+        [Header("UI Styling")]
+        public Image buttonBackground;
+        public Image buttonIcon;
+
+        [Header("Linked UI")]
+        public GameObject colorUIPanel; 
     }
 
     [Header("Configuration")]
@@ -28,13 +36,10 @@ public class ViewModeManager : MonoBehaviour
     public PaletteController paletteController;
 
     [Header("Color Style")]
-    // 선택되었을 때 (Active)
-    public Color activeBgColor = Color.black;      // 배경: 검정
-    public Color activeIconColor = Color.white;    // 아이콘: 흰색
-
-    // 선택 안 되었을 때 (Inactive)
-    public Color inactiveBgColor = Color.white;    // 배경: 흰색 (또는 투명)
-    public Color inactiveIconColor = Color.black;  // 아이콘: 검정
+    public Color activeBgColor = Color.black;
+    public Color activeIconColor = Color.white;
+    public Color inactiveBgColor = Color.white;
+    public Color inactiveIconColor = Color.black;
 
     private void Start()
     {
@@ -43,12 +48,10 @@ public class ViewModeManager : MonoBehaviour
             var currentView = view;
             if (currentView.button != null)
             {
-                // 버튼 클릭 시 SelectView 실행
                 currentView.button.onClick.AddListener(() => SelectView(currentView));
             }
         }
 
-        // 시작하자마자 첫 번째 뷰 선택 상태로 만들기
         if (viewList.Count > 0) SelectView(viewList[0]);
     }
 
@@ -58,29 +61,35 @@ public class ViewModeManager : MonoBehaviour
         {
             bool isSelected = (view == selectedOption);
 
-            Color targetBg = isSelected ? activeBgColor : inactiveBgColor;
-            Color targetIcon = isSelected ? activeIconColor : inactiveIconColor;
-
+            // 1. 버튼 스타일 변경
             if (view.buttonBackground != null)
-            {
-                view.buttonBackground.DOColor(targetBg, 0.2f);
-            }
+                view.buttonBackground.DOColor(isSelected ? activeBgColor : inactiveBgColor, 0.2f);
 
             if (view.buttonIcon != null)
-            {
-                view.buttonIcon.DOColor(targetIcon, 0.2f);
-            }
+                view.buttonIcon.DOColor(isSelected ? activeIconColor : inactiveIconColor, 0.2f);
+
+            // 2. 연결된 색상 패널(UI) 켜기/끄기
+            if (view.colorUIPanel != null)
+                view.colorUIPanel.SetActive(isSelected);
         }
 
-        // 카메라 이동 로직
         if (cameraController != null && selectedOption.cameraTarget != null)
         {
+            // 오르빗 컨트롤러의 회전 중심축 설정
+            if (cameraController.orbitController != null)
+            {
+                // 설정된 피벗이 있으면 그걸 쓰고, 없으면 그냥 자동차 중심(기존 타겟) 유지
+                if (selectedOption.orbitPivot != null)
+                    cameraController.orbitController.target = selectedOption.orbitPivot;
+            }
+
             cameraController.MoveToTarget(selectedOption.cameraTarget);
+
             Camera.main.DOFieldOfView(selectedOption.fieldOfView, cameraController.transitionDuration)
                  .SetEase(cameraController.movementEase);
         }
 
-        // 팔레트 컨트롤러에게 모드 전달
+        // 팔레트 상태 업데이트
         if (paletteController != null)
         {
             bool isExterior = (selectedOption.viewName == "Exterior");
