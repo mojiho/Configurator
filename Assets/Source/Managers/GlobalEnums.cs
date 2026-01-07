@@ -17,11 +17,13 @@ public enum CarTrim
 /// </summary>
 public enum PartType
 {
-    Paint,      // 외장 페인트
-    Wheel,      // 휠
-    Interior,   // 내장재
-    RoofRack,    // 루프랙
-    Exterior    // 외관
+    None,       // 없음 (메뉴 닫힘)
+    Paint,      // [외장 기본] 차체 색상
+    Wheel,      // [외장 옵션] 휠 교체
+    Interior,   // [내장 기본] 내장재 색상
+    RoofRack,   // [외장 옵션] 루프랙
+    Exterior,   // [외장 옵션] 기타 외관 파츠
+    MaytonAll   // Mayton 파츠 전체 
 }
 
 /// <summary>
